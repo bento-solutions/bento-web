@@ -29,6 +29,8 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+      # Traefik only routes to healthy containers, so this sets how long a deploy leaves /blog unserved.
+      start_interval: 2s
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
@@ -43,7 +45,9 @@ services:
       - "traefik.http.routers.bento-web-cms.rule=Host(`cms.bento212.com`)"
       - "traefik.http.routers.bento-web-cms.entrypoints=websecure"
       - "traefik.http.routers.bento-web-cms.tls=true"
-      - "traefik.http.routers.bento-web-cms.tls.certresolver=letsencrypt"
+      # Off while .env has an empty CMS_CERT_RESOLVER, because Traefik retries a failing certificate
+      # on every container event. ops/enable-cms.sh turns it on once DNS is in place.
+      - "traefik.http.routers.bento-web-cms.tls.certresolver=${CMS_CERT_RESOLVER-letsencrypt}"
       - "traefik.http.routers.bento-web-cms.service=bento-web"
       - "traefik.http.services.bento-web.loadbalancer.server.port=3000"
 

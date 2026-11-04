@@ -106,10 +106,10 @@ First-time setup:
 
    The dev directory also needs `DEV_BASIC_AUTH`, an htpasswd line with every `$` doubled.
 5. **Go live:** set `DEPLOY_ENABLED` to `true` and push.
-6. **First administrator:** the form is hidden until someone opens the private link below. The first account created becomes the administrator, and after that the form is closed for good.
+6. **First administrator:** once the DNS record exists, run the command below. It turns on the `cms.` certificate and prints a private link. The first account created through that link becomes the administrator, and after that the form is closed for good.
 
    ```bash
-   ssh bento-prod 'echo "https://cms.bento212.com/admin/create-first-user?setup=$(grep ^SETUP_TOKEN= /srv/bento/apps/bento-web/.env | cut -d= -f2)"'
+   ssh bento-prod /srv/bento/apps/bento-web/ops/enable-cms.sh
    ```
 
    Then create the team's accounts. Without SMTP, forgotten passwords cannot be reset by email: an administrator sets a new one from the user's page.
