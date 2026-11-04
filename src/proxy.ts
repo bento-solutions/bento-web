@@ -2,6 +2,7 @@ import createMiddleware from 'next-intl/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { routing } from './i18n/routing'
+import { firstAdminGate, SETUP_COOKIE, SETUP_PARAM } from './lib/first-admin-gate'
 
 const intl = createMiddleware(routing)
 
@@ -28,6 +29,27 @@ export default function proxy(req: NextRequest): NextResponse {
   const cmsHost = process.env.CMS_HOST
   const { pathname } = req.nextUrl
   const isAdminPath = ADMIN_PATHS.test(pathname)
+
+  const gate = firstAdminGate({
+    pathname,
+    token: process.env.SETUP_TOKEN,
+    cookie: req.cookies.get(SETUP_COOKIE)?.value,
+    param: req.nextUrl.searchParams.get(SETUP_PARAM),
+  })
+  if (gate === 'deny') return new NextResponse(null, { status: 404 })
+  if (gate === 'unlock') {
+    const clean = req.nextUrl.clone()
+    clean.searchParams.delete(SETUP_PARAM)
+    const response = NextResponse.redirect(clean)
+    response.cookies.set(SETUP_COOKIE, process.env.SETUP_TOKEN as string, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: req.nextUrl.protocol === 'https:',
+      maxAge: 60 * 60,
+      path: '/',
+    })
+    return response
+  }
 
   if (cmsHost) {
     const onCmsHost = hostOf(req) === cmsHost

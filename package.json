@@ -15,12 +15,15 @@
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
-    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed.ts"
+    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed.ts",
+    "publish:launch": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/publish-launch.ts"
   },
   "engines": {
     "node": "^22.23.4 || >=24.22.1"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "1.4.0",
+    "@google/genai": "2.32.0",
     "@payloadcms/db-postgres": "3.92.1",
     "@payloadcms/email-nodemailer": "3.92.1",
     "@payloadcms/live-preview-react": "3.92.1",

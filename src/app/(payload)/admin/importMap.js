@@ -20,10 +20,13 @@ import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
+import { AssistantPanel as AssistantPanel_7cddee5797cd413d6adbceddf8d4d977 } from '../../../components/admin/AssistantPanel'
+import { SeoChecklist as SeoChecklist_95037f3e1bb4ad106416897ffd7c2815 } from '../../../components/admin/SeoChecklist'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { PublishButton as PublishButton_85c066c9e85977a669a8719b5844b2d5 } from '../../../components/admin/PublishButton'
 import { Icon as Icon_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
+import { ReviewQueue as ReviewQueue_db54637123a947115f2a8ff6a7a45275 } from '../../../components/admin/ReviewQueue'
 import { WritingGuide as WritingGuide_64e2c532d0c16f5b37eb36e1f5f188b1 } from '../../../components/admin/WritingGuide'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -51,10 +54,13 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
+  "/components/admin/AssistantPanel#AssistantPanel": AssistantPanel_7cddee5797cd413d6adbceddf8d4d977,
+  "/components/admin/SeoChecklist#SeoChecklist": SeoChecklist_95037f3e1bb4ad106416897ffd7c2815,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
   "/components/admin/PublishButton#PublishButton": PublishButton_85c066c9e85977a669a8719b5844b2d5,
   "/components/admin/Logo#Icon": Icon_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
+  "/components/admin/ReviewQueue#ReviewQueue": ReviewQueue_db54637123a947115f2a8ff6a7a45275,
   "/components/admin/WritingGuide#WritingGuide": WritingGuide_64e2c532d0c16f5b37eb36e1f5f188b1,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

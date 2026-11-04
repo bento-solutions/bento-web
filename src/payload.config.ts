@@ -12,6 +12,7 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { editorsOnly } from './access/roles'
+import { assistantEndpoints } from './assistant/endpoints'
 import { Authors } from './collections/Authors'
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
@@ -50,7 +51,7 @@ export default buildConfig({
         Logo: '/components/admin/Logo#Logo',
         Icon: '/components/admin/Logo#Icon',
       },
-      afterDashboard: ['/components/admin/WritingGuide#WritingGuide'],
+      afterDashboard: ['/components/admin/ReviewQueue#ReviewQueue', '/components/admin/WritingGuide#WritingGuide'],
     },
   },
   // The admin itself, in the language the team works in.
@@ -69,6 +70,9 @@ export default buildConfig({
     fallback: true,
   },
   collections: [Posts, Categories, Authors, Media, Users],
+  endpoints: assistantEndpoints(),
+  // Nothing uses GraphQL. Left on, it would be one more way in to guard.
+  graphQL: { disable: true },
   editor: lexicalEditor(),
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({

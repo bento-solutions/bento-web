@@ -3,8 +3,9 @@ import { builders } from './lexical'
 const { p, h2, ul, ol, quote, table, block, doc } = builders()
 
 /**
- * Sample articles, written to show the design with real text and to give the team a model to follow.
- * They are not checked by an accountant or a lawyer. Review or replace them before going public.
+ * The launch articles. They were written with AI assistance and contain practical advice only, except
+ * the invoice article (`hold`), which makes tax claims and stays in review until an accountant signs off.
+ * No accountant or lawyer has checked any of them.
  */
 export const samplePosts = [
   {
@@ -63,7 +64,11 @@ export const samplePosts = [
     body: doc(
       p('Un patient qui ne vient pas, c’est un créneau payé deux fois : le temps de l’équipe est perdu, et un autre patient aurait pu en profiter. La plupart des absences ne viennent pas d’un manque de sérieux, mais d’un oubli ou d’un empêchement que personne n’a eu le temps de signaler.'),
       h2('Rappelez au bon moment, sur le bon canal'),
-      p('Un rappel la veille, sur WhatsApp, fonctionne mieux qu’un appel que personne ne décroche. Pour un long traitement, ajoutez un rappel quelques jours avant.'),
+      p('Un rappel la veille sur WhatsApp arrive même quand personne ne peut décrocher, et le patient le retrouve au moment où il en a besoin. Pour un long traitement, ajoutez un rappel quelques jours avant.'),
+      block('callout', {
+        kind: 'note',
+        text: 'Gardez le message neutre : le jour et l’heure, pas le motif du soin. Au Maroc, la loi 09-08 classe les données de santé parmi les données sensibles. En cas de doute sur vos pratiques, demandez conseil.',
+      }),
       h2('Rendez l’annulation facile'),
       p('Cela semble contre-intuitif. Pourtant, un patient qui peut annuler d’un simple message le fait à temps, et le créneau peut encore servir.'),
       block('callout', {
@@ -138,6 +143,10 @@ export const samplePosts = [
   },
   {
     key: 'facture',
+    // Tax content. It waits in the review queue until an accountant has checked it.
+    hold: true,
+    reviewNotes:
+      'À faire valider par un comptable avant publication. Vérifier la liste des mentions avec l’article 145 du Code général des impôts, en particulier le numéro CNSS (usuel, mais à confirmer comme obligation), la règle de numérotation et l’usage de l’avoir. Les sources officielles n’ont pas pu être consultées lors de la rédaction.',
     category: 'facturation',
     cover: 'facture',
     publishedAt: '2026-10-22T09:00:00.000Z',
@@ -248,7 +257,7 @@ export const samplePosts = [
       ]),
       block('callout', {
         kind: 'tip',
-        text: 'Deux de ces signes suffisent pour commencer à regarder ailleurs. À partir de trois, le tableur vous coûte probablement plus cher qu’un logiciel.',
+        text: 'Deux de ces signes suffisent pour commencer à regarder ailleurs. À partir de trois, faites le calcul : le temps perdu et les ventes oubliées pèsent souvent plus que le prix d’un logiciel.',
       }),
       h2('Ce qui change vraiment avec un CRM'),
       table([

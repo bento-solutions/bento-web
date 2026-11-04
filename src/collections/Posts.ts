@@ -209,6 +209,16 @@ export const Posts: CollectionConfig = {
           ],
         },
         {
+          label: { fr: 'Assistant', en: 'Assistant' },
+          fields: [
+            {
+              name: 'assistantPanel',
+              type: 'ui',
+              admin: { components: { Field: '/components/admin/AssistantPanel#AssistantPanel' } },
+            },
+          ],
+        },
+        {
           label: { fr: 'Stratégie', en: 'Strategy' },
           description: {
             fr: 'Notes internes, jamais affichées sur le site.',
@@ -248,6 +258,11 @@ export const Posts: CollectionConfig = {
           ],
         },
       ],
+    },
+    {
+      name: 'seoChecklist',
+      type: 'ui',
+      admin: { position: 'sidebar', components: { Field: '/components/admin/SeoChecklist#SeoChecklist' } },
     },
     {
       name: 'reviewStatus',

@@ -7,9 +7,8 @@ import {
 
 import { allowedReviewStatuses, canPublish, type ReviewStatus } from '../access/roles'
 import { type LexicalDocument, readingMinutes } from '../lib/lexical'
+import { META_DESCRIPTION_MAX, META_DESCRIPTION_MIN } from '../lib/seo-checklist'
 
-const META_DESCRIPTION_MIN = 50
-const META_DESCRIPTION_MAX = 160
 
 type PostData = {
   title?: string | null
