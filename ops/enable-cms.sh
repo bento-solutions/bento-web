@@ -10,7 +10,8 @@ CMS=cms.bento212.com
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 SERVER_IP="$(curl -4 -sS --max-time 10 https://api.ipify.org)"
-DNS_IP="$(getent ahostsv4 "$CMS" | awk 'NR==1{print $1}')"
+# getent fails when there is no record yet. With pipefail, that would otherwise end the script silently.
+DNS_IP="$(getent ahostsv4 "$CMS" | awk 'NR==1{print $1}' || true)"
 if [ "$DNS_IP" != "$SERVER_IP" ]; then
   echo "Not yet: $CMS points to '${DNS_IP:-nothing}', and this server is $SERVER_IP." >&2
   echo "Add the A record, wait a few minutes, then run this again." >&2
