@@ -1,0 +1,65 @@
+# Dev environment: one password-protected host, never indexed. Its data is its own.
+services:
+  web:
+    image: ghcr.io/bento-solutions/bento-web:${WEB_IMAGE_TAG:-dev}
+    container_name: bento-web-dev
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      SITE_URL: https://dev.bento212.com
+      CMS_URL: https://dev.bento212.com
+      SITE_NOINDEX: "1"
+      DATABASE_URL: postgres://bento_web:${POSTGRES_PASSWORD}@postgres:5432/bento_web
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - bento-web-media-dev:/app/media
+    networks:
+      - proxy
+      - internal
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.bento-web-dev.rule=Host(`dev.bento212.com`)"
+      - "traefik.http.routers.bento-web-dev.entrypoints=websecure"
+      - "traefik.http.routers.bento-web-dev.tls=true"
+      - "traefik.http.routers.bento-web-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bento-web-dev.middlewares=bento-web-dev-auth"
+      # htpasswd line with every $ doubled, set in .env.
+      - "traefik.http.middlewares.bento-web-dev-auth.basicauth.users=${DEV_BASIC_AUTH:?set DEV_BASIC_AUTH in .env}"
+      - "traefik.http.services.bento-web-dev.loadbalancer.server.port=3000"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: bento-web-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bento_web
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: bento_web
+    volumes:
+      - bento-web-postgres-dev:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bento_web"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  bento-web-media-dev:
+  bento-web-postgres-dev:
+
+networks:
+  proxy:
+    external: true
+  internal:

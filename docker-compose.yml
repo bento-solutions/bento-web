@@ -1,0 +1,78 @@
+# Production. The brochure app keeps bento212.com's homepage; this stack takes over /blog,
+# the assets it needs, and the domain's robots.txt and sitemap.xml (the brochure has neither).
+services:
+  web:
+    # `image` lets CI deploy by `docker compose pull`; `build` keeps manual builds working.
+    image: ghcr.io/bento-solutions/bento-web:${WEB_IMAGE_TAG:-latest}
+    build:
+      context: .
+    container_name: bento-web
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      SITE_URL: https://bento212.com
+      CMS_HOST: cms.bento212.com
+      CMS_URL: https://cms.bento212.com
+      DATABASE_URL: postgres://bento_web:${POSTGRES_PASSWORD}@postgres:5432/bento_web
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - bento-web-media:/app/media
+    networks:
+      - proxy
+      - internal
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      # Readers. `priority` beats the brochure's catch-all rule for these paths only.
+      - "traefik.http.routers.bento-web.rule=Host(`bento212.com`) && (PathRegexp(`^/((fr|en|ar)/)?blog(/|$)`) || PathPrefix(`/_next/`) || PathPrefix(`/media/`) || Path(`/robots.txt`) || Path(`/sitemap.xml`))"
+      - "traefik.http.routers.bento-web.priority=100"
+      - "traefik.http.routers.bento-web.entrypoints=websecure"
+      - "traefik.http.routers.bento-web.tls=true"
+      - "traefik.http.routers.bento-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bento-web.service=bento-web"
+      # The team. The same container, on its own hostname.
+      - "traefik.http.routers.bento-web-cms.rule=Host(`cms.bento212.com`)"
+      - "traefik.http.routers.bento-web-cms.entrypoints=websecure"
+      - "traefik.http.routers.bento-web-cms.tls=true"
+      - "traefik.http.routers.bento-web-cms.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bento-web-cms.service=bento-web"
+      - "traefik.http.services.bento-web.loadbalancer.server.port=3000"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: bento-web-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bento_web
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: bento_web
+    ports:
+      # Loopback only: Docker publishes past ufw, so this bind is what keeps it private.
+      - "127.0.0.1:5438:5432"
+    volumes:
+      - bento-web-postgres:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bento_web"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  bento-web-media:
+  bento-web-postgres:
+
+networks:
+  proxy:
+    external: true
+  internal:

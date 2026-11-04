@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment
+.env
+.env.local
+
+# Uploaded files live in a Docker volume in production
+/media/
+
+.DS_Store
+coverage/

@@ -1,0 +1,83 @@
+{
+  "site": {
+    "brand": "The notebook",
+    "skip": "Skip to content",
+    "description": "Advice and methods for running a small business in Morocco: customers, invoices, cash flow and teams.",
+    "metaTitle": "The Bento notebook: advice for small businesses in Morocco"
+  },
+  "nav": {
+    "articles": "Articles",
+    "tryBento": "Book a demo",
+    "toggleTheme": "Change theme",
+    "languages": "Other languages",
+    "breadcrumb": "Breadcrumb",
+    "main": "Main navigation"
+  },
+  "blog": {
+    "badge": "Blog",
+    "title": "The notebook",
+    "subtitle": "Plain advice and tested methods for running a small business in Morocco: customers, invoices, cash flow and teams.",
+    "viewAll": "View all posts",
+    "mustRead": "Must read",
+    "by": "By {name}",
+    "minutes": "{count} min",
+    "entry": "No. {number}",
+    "count": "{count, plural, =0 {No posts} one {# post} other {# posts}}",
+    "lastEntry": "Last entry on {date}",
+    "empty": "The first posts are coming soon.",
+    "registerTitle": "The register",
+    "registerLead": "Every post, newest first.",
+    "colEntry": "No.",
+    "colTitle": "Post",
+    "colTopic": "Topic",
+    "colDate": "Date",
+    "colRead": "Read",
+    "allTopics": "All",
+    "topics": "Topics",
+    "previous": "Previous page",
+    "next": "Next page",
+    "pageOf": "Page {page} of {total}",
+    "pageTitle": "The notebook, page {page}"
+  },
+  "article": {
+    "contents": "Contents",
+    "publishedOn": "Published on {date}",
+    "updatedOn": "Updated on {date}",
+    "share": "Share",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "writtenBy": "Written by",
+    "readAlso": "Read next",
+    "faq": "Frequently asked questions",
+    "tip": "Tip",
+    "note": "Good to know",
+    "warning": "Watch out",
+    "preview": "You are viewing a preview.",
+    "exitPreview": "Exit preview"
+  },
+  "author": {
+    "articlesBy": "Posts by {name}"
+  },
+  "cta": {
+    "title": "Your customers, invoices and teams in one place.",
+    "text": "Bento replaces scattered spreadsheets with a single system, built for Moroccan businesses.",
+    "button": "Book a demo",
+    "secondary": "See the products"
+  },
+  "footer": {
+    "about": "The blog of Bento Solutions, an ERP and CRM software company in Casablanca.",
+    "notebook": "The notebook",
+    "products": "Products",
+    "company": "Company",
+    "website": "Main website",
+    "contact": "Write to us",
+    "rss": "RSS feed",
+    "rights": "© {year} Bento Solutions SARL"
+  },
+  "notFound": {
+    "code": "Error 404",
+    "title": "This page is not in the register.",
+    "text": "The address may have changed, or the post may not exist in this language yet.",
+    "back": "Back to the notebook"
+  }
+}

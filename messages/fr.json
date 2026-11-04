@@ -1,0 +1,83 @@
+{
+  "site": {
+    "brand": "Le carnet",
+    "skip": "Aller au contenu",
+    "description": "Conseils et méthodes pour faire tourner une petite entreprise au Maroc : clients, factures, trésorerie et équipes.",
+    "metaTitle": "Le carnet Bento : conseils pour les petites entreprises au Maroc"
+  },
+  "nav": {
+    "articles": "Articles",
+    "tryBento": "Réserver une démo",
+    "toggleTheme": "Changer de thème",
+    "languages": "Autres langues",
+    "breadcrumb": "Fil d’Ariane",
+    "main": "Navigation principale"
+  },
+  "blog": {
+    "badge": "Blog",
+    "title": "Le carnet",
+    "subtitle": "Des conseils simples et des méthodes testées pour faire tourner une petite entreprise au Maroc : clients, factures, trésorerie et équipes.",
+    "viewAll": "Voir tous les articles",
+    "mustRead": "À lire",
+    "by": "Par {name}",
+    "minutes": "{count} min",
+    "entry": "N° {number}",
+    "count": "{count, plural, =0 {Aucun article} one {# article} other {# articles}}",
+    "lastEntry": "Dernière entrée le {date}",
+    "empty": "Les premiers articles arrivent bientôt.",
+    "registerTitle": "Le registre",
+    "registerLead": "Tous les articles, du plus récent au plus ancien.",
+    "colEntry": "N°",
+    "colTitle": "Article",
+    "colTopic": "Thème",
+    "colDate": "Date",
+    "colRead": "Lecture",
+    "allTopics": "Tous",
+    "topics": "Thèmes",
+    "previous": "Page précédente",
+    "next": "Page suivante",
+    "pageOf": "Page {page} sur {total}",
+    "pageTitle": "Le carnet, page {page}"
+  },
+  "article": {
+    "contents": "Sommaire",
+    "publishedOn": "Publié le {date}",
+    "updatedOn": "Mis à jour le {date}",
+    "share": "Partager",
+    "copyLink": "Copier le lien",
+    "copied": "Lien copié",
+    "writtenBy": "Écrit par",
+    "readAlso": "À lire aussi",
+    "faq": "Questions fréquentes",
+    "tip": "Conseil",
+    "note": "À savoir",
+    "warning": "Attention",
+    "preview": "Vous regardez un aperçu.",
+    "exitPreview": "Quitter l’aperçu"
+  },
+  "author": {
+    "articlesBy": "Articles de {name}"
+  },
+  "cta": {
+    "title": "Vos clients, vos factures et vos équipes au même endroit.",
+    "text": "Bento remplace les tableurs éparpillés par un seul système, pensé pour les entreprises marocaines.",
+    "button": "Réserver une démo",
+    "secondary": "Découvrir les produits"
+  },
+  "footer": {
+    "about": "Le blog de Bento Solutions, éditeur de logiciels ERP et CRM à Casablanca.",
+    "notebook": "Le carnet",
+    "products": "Produits",
+    "company": "Société",
+    "website": "Site officiel",
+    "contact": "Nous écrire",
+    "rss": "Flux RSS",
+    "rights": "© {year} Bento Solutions SARL"
+  },
+  "notFound": {
+    "code": "Erreur 404",
+    "title": "Cette page n’est pas au registre.",
+    "text": "L’adresse a peut-être changé, ou l’article n’existe pas encore dans cette langue.",
+    "back": "Retour au carnet"
+  }
+}

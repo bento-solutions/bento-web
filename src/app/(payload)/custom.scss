@@ -1,0 +1,44 @@
+// Brings the admin close to the Bento palette, without restyling Payload's components.
+:root {
+  --font-body: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --style-radius-s: 8px;
+  --style-radius-m: 8px;
+  --style-radius-l: 12px;
+}
+
+html[data-theme='light'] {
+  --theme-bg: #f7f7f5;
+  --theme-input-bg: #ffffff;
+  --theme-text: #1c1b19;
+}
+
+html[data-theme='light'] .btn--style-primary:not(.btn--disabled) {
+  --bg-color: #2b46b5;
+  --hover-bg: #233a99;
+  --color: #ffffff;
+  --hover-color: #ffffff;
+}
+
+.writing-guide {
+  max-width: 720px;
+  margin-block: 32px;
+  padding: 20px 24px;
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 12px;
+  background: var(--theme-input-bg);
+
+  h2 {
+    font-size: 18px;
+    margin-block-end: 12px;
+  }
+
+  ol {
+    margin: 0;
+    padding-inline-start: 20px;
+  }
+
+  li {
+    margin-block-end: 8px;
+    line-height: 1.5;
+  }
+}

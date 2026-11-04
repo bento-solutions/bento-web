@@ -1,0 +1,22 @@
+# Local Postgres only. Run the app with `npm run dev`.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bento-web-postgres-local
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bento_web
+    ports:
+      - "127.0.0.1:5440:5432"
+    volumes:
+      - bento-web-postgres-local:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  bento-web-postgres-local:
