@@ -131,7 +131,8 @@ export const AssistantPanel = () => {
     <section className="assistant-panel">
       <p className="assistant-panel__rule">
         L’assistant propose, vous décidez. Il peut se tromper : vérifiez chaque fait, chiffre et référence légale avant
-        de soumettre l’article. Il ne publie jamais rien.
+        de soumettre l’article. Il ne publie jamais rien. Ce que vous lui envoyez part chez un prestataire externe :
+        n’y mettez aucune donnée client ni information confidentielle.
       </p>
 
       {!status.text && !status.image && (
