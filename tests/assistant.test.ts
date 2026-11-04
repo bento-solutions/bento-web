@@ -123,6 +123,8 @@ describe('provider errors', () => {
     ['gemini-3.8-flash is currently experiencing high demand', 'overloaded'],
     ['503 service_unavailable', 'overloaded'],
     ['The operation timed out', 'overloaded'],
+    // The exact message Google sent. It says "upgrade your tier", and it is still only a daily limit.
+    ['Rate limit exceeded for model gemini-3.8-flash (limit: 20 requests per day on Free Tier). Please retry in 21h33m8s or upgrade your tier', 'rate-limit'],
     ['Rate limit exceeded for model x (limit: 15 requests per minute)', 'rate-limit'],
     ['API key not valid', 'bad-key'],
     ['socket hang up', 'other'],
@@ -150,10 +152,18 @@ describe('Gemini text', () => {
     }
   })
 
+  it('moves on when a model has used up its daily limit', async () => {
+    genai.create
+      .mockRejectedValueOnce(new Error('Rate limit exceeded for model gemini-3.8-flash (limit: 20 requests per day on Free Tier). Please retry in 21h33m8s or upgrade your tier'))
+      .mockResolvedValueOnce({ output_text: 'Réponse.' })
+    await expect(geminiText('k').generate(request)).resolves.toBe('Réponse.')
+    expect(genai.create).toHaveBeenCalledTimes(2)
+  })
+
   it('reports the failure when every model is busy', async () => {
     genai.create.mockRejectedValue(busy())
     await expect(geminiText('k').generate(request)).rejects.toThrow('high demand')
-    expect(genai.create).toHaveBeenCalledTimes(2)
+    expect(genai.create).toHaveBeenCalledTimes(3)
   })
 
   it('does not hide other failures behind the fallback', async () => {

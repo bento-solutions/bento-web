@@ -1,11 +1,15 @@
 import { AssistantError, type GeneratedImage, type ImageGenerator, type TextGenerator, type TextRequest } from '@/domain/assistant'
 
-import { classifyProviderError } from './errors'
+import { classifyProviderError, type ProviderProblem } from './errors'
 
 const TIMEOUT_MS = 120_000
 
-/** Google's newest Flash model is often busy. The previous one writes nearly as well, and a writer should not have to wait. */
-const GEMINI_TEXT_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash']
+/**
+ * Best first. Each has its own quota, which matters on Google's free tier: gemini-3.8-flash allows only
+ * 20 requests a day across the whole team, and is often busy as well. A writer should not have to wait for that.
+ */
+const GEMINI_TEXT_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite']
+const TRY_NEXT_MODEL = new Set<ProviderProblem>(['overloaded', 'rate-limit', 'no-quota'])
 
 /**
  * Set per request, because interactions.create ignores the client's retry settings. Moving to the next
@@ -59,7 +63,7 @@ export const geminiText = (apiKey: string): TextGenerator => ({
         return text
       } catch (err) {
         const hasNext = index < models.length - 1
-        if (!hasNext || classifyProviderError(err) !== 'overloaded') throw err
+        if (!hasNext || !TRY_NEXT_MODEL.has(classifyProviderError(err))) throw err
       }
     }
     throw new AssistantError('Le modèle n’a rien renvoyé. Réessayez.')
