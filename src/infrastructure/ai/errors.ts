@@ -14,7 +14,7 @@ const chainText = (err: unknown): string => {
 export const classifyProviderError = (err: unknown): ProviderProblem => {
   const text = chainText(err)
   if (/limit: 0\b|upgrade your tier|insufficient[_ ]quota|credit balance/i.test(text)) return 'no-quota'
-  if (/high demand|service_unavailable|overloaded|\b50[34]\b/i.test(text)) return 'overloaded'
+  if (/high demand|service_unavailable|overloaded|\b50[34]\b|timed? ?out|aborted/i.test(text)) return 'overloaded'
   if (/rate limit|too_many_requests|\b429\b/i.test(text)) return 'rate-limit'
   if (/api[ _-]?key|unauthori[sz]ed|permission[ _]denied|\b401\b|\b403\b/i.test(text)) return 'bad-key'
   return 'other'

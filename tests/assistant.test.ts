@@ -122,6 +122,7 @@ describe('provider errors', () => {
     ['Rate limit exceeded for model x (limit: 0 input tokens per minute on Free Tier)', 'no-quota'],
     ['gemini-3.8-flash is currently experiencing high demand', 'overloaded'],
     ['503 service_unavailable', 'overloaded'],
+    ['The operation timed out', 'overloaded'],
     ['Rate limit exceeded for model x (limit: 15 requests per minute)', 'rate-limit'],
     ['API key not valid', 'bad-key'],
     ['socket hang up', 'other'],
@@ -142,6 +143,11 @@ describe('Gemini text', () => {
     genai.create.mockRejectedValueOnce(busy()).mockResolvedValueOnce({ output_text: ' Réponse. ' })
     await expect(geminiText('k').generate(request)).resolves.toBe('Réponse.')
     expect(genai.create.mock.calls.map(([args]) => args.model)).toEqual(['gemini-3.8-flash', 'gemini-3.5-flash'])
+    // A busy model must fail fast, and nothing may wait forever: this is what the real API needed.
+    for (const [, options] of genai.create.mock.calls) {
+      expect(options.retries).toEqual({ strategy: 'none' })
+      expect(options.timeout_ms).toBeGreaterThan(0)
+    }
   })
 
   it('reports the failure when every model is busy', async () => {
