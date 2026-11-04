@@ -3,6 +3,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { assistantEndpoints, LIMITS, resetAssistantLimits } from '@/assistant/endpoints'
 import { AssistantError, type ImageGenerator, type TextGenerator } from '@/domain/assistant'
+import { geminiText } from '@/infrastructure/ai'
+import { classifyProviderError } from '@/infrastructure/ai/errors'
+
+const genai = vi.hoisted(() => ({ create: vi.fn() }))
+vi.mock('@google/genai', () => ({
+  GoogleGenAI: class {
+    interactions = { create: genai.create }
+  },
+}))
 
 const png = Buffer.from('fake-image')
 
@@ -85,6 +94,16 @@ describe('assistant endpoints', () => {
     expect(String(result.body.error)).not.toContain('secret')
   })
 
+  it('explains a free-tier image block instead of a vague failure', async () => {
+    const wrapped = Object.assign(new Error('Interaction failed'), {
+      cause: new Error('Rate limit exceeded for model gemini-nano-banana-2.1 (limit: 0 requests per day on Free Tier). Please upgrade your tier'),
+    })
+    const { call } = setup({ image: { generate: async () => { throw wrapped } } })
+    const result = await call('/assistant/image', { subject: 'un comptoir', alt: 'Un comptoir' })
+    expect(result.status).toBe(502)
+    expect(String(result.body.error)).toContain('facturation')
+  })
+
   it('saves a generated cover as AI media, as the person asking, and requires alt text', async () => {
     const { call, create, generateImage } = setup()
     expect((await call('/assistant/image', { subject: 'un comptoir' })).status).toBe(400)
@@ -95,5 +114,45 @@ describe('assistant endpoints', () => {
     const [args] = create.mock.calls[0] as unknown as [Record<string, never>]
     expect(args).toMatchObject({ collection: 'media', overrideAccess: false, locale: 'fr', data: { alt: 'Un comptoir', source: 'ai' } })
     expect((args.file as unknown as { name: string }).name).toBe('un-comptoir-a-casablanca.png')
+  })
+})
+
+describe('provider errors', () => {
+  it.each([
+    ['Rate limit exceeded for model x (limit: 0 input tokens per minute on Free Tier)', 'no-quota'],
+    ['gemini-3.8-flash is currently experiencing high demand', 'overloaded'],
+    ['503 service_unavailable', 'overloaded'],
+    ['Rate limit exceeded for model x (limit: 15 requests per minute)', 'rate-limit'],
+    ['API key not valid', 'bad-key'],
+    ['socket hang up', 'other'],
+  ])('reads "%s" as %s', (message, expected) => {
+    expect(classifyProviderError(new Error(message))).toBe(expected)
+  })
+})
+
+describe('Gemini text', () => {
+  const request = { system: 's', prompt: 'p', maxTokens: 100 }
+  const busy = () => new Error('gemini-3.8-flash is currently experiencing high demand')
+
+  beforeEach(() => {
+    genai.create.mockReset()
+  })
+
+  it('moves to the previous model when the newest is busy', async () => {
+    genai.create.mockRejectedValueOnce(busy()).mockResolvedValueOnce({ output_text: ' Réponse. ' })
+    await expect(geminiText('k').generate(request)).resolves.toBe('Réponse.')
+    expect(genai.create.mock.calls.map(([args]) => args.model)).toEqual(['gemini-3.8-flash', 'gemini-3.5-flash'])
+  })
+
+  it('reports the failure when every model is busy', async () => {
+    genai.create.mockRejectedValue(busy())
+    await expect(geminiText('k').generate(request)).rejects.toThrow('high demand')
+    expect(genai.create).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not hide other failures behind the fallback', async () => {
+    genai.create.mockRejectedValue(new Error('API key not valid'))
+    await expect(geminiText('k').generate(request)).rejects.toThrow('API key')
+    expect(genai.create).toHaveBeenCalledTimes(1)
   })
 })

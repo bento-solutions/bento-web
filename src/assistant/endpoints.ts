@@ -11,6 +11,7 @@ import {
 } from '@/domain/assistant'
 import type { Locale } from '@/domain/types'
 import { imageGenerator, textGenerator } from '@/infrastructure/ai'
+import { classifyProviderError, PROVIDER_MESSAGES } from '@/infrastructure/ai/errors'
 import { slugify } from '@/lib/slugify'
 
 import { buildImagePrompt, buildTextRequest } from './prompts'
@@ -50,8 +51,9 @@ const isLocale = (value: unknown): value is Locale => value === 'fr' || value ==
 
 const failure = (req: PayloadRequest, err: unknown): Response => {
   if (err instanceof AssistantError) return json({ error: err.message }, 502)
-  req.payload.logger.error({ err }, 'Assistant request failed')
-  return json({ error: 'Le service d’IA n’a pas répondu. Réessayez dans un instant.' }, 502)
+  const problem = classifyProviderError(err)
+  req.payload.logger.error({ err, problem }, 'Assistant request failed')
+  return json({ error: PROVIDER_MESSAGES[problem] }, 502)
 }
 
 /** Generators are passed in so tests never call a paid API. */

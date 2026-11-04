@@ -41,7 +41,7 @@ Changing the slug of a published post leaves a permanent redirect behind.
 
 **Assistant tab:** proposes outlines, drafts, titles, a standfirst, a Google description, a FAQ, proofreading and translations, and generates covers in the house style with Nano Banana. It never publishes. Using its text or cover ticks *Rédigé avec l'aide de l'IA*, and it is told to mark any figure or legal reference `[à vérifier]`. Each person gets 40 text requests and 10 images an hour.
 
-To switch it on, add a key to the server's `.env` and recreate the container. `GEMINI_API_KEY` alone runs both text and images. With `ANTHROPIC_API_KEY` as well, text moves to Claude (`claude-opus-5-5`), and any request Claude's safety checks decline is retried on another model by Anthropic's API (`fallbacks: "default"`). `AI_TEXT_MODEL`, `AI_GEMINI_TEXT_MODEL` and `AI_IMAGE_MODEL` override the models.
+To switch it on, add a key to the server's `.env` and recreate the container. `GEMINI_API_KEY` alone runs text, moving from `gemini-3.8-flash` to `gemini-3.5-flash` when the first is busy. Covers use the same key but need billing on its Google project, because the free tier has a limit of zero on every image model. With `ANTHROPIC_API_KEY` as well, text moves to Claude (`claude-opus-5-5`), and any request Claude's safety checks decline is retried on another model by Anthropic's API (`fallbacks: "default"`). `AI_TEXT_MODEL`, `AI_GEMINI_TEXT_MODEL` and `AI_IMAGE_MODEL` override the models.
 
 **Translations:** switch the locale at the top of the admin and fill in the post. A language goes live for a post only when it has both a slug and a body, and a language appears on the site only once it has a post. Nothing else needs turning on.
 

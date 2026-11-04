@@ -1,6 +1,14 @@
 import { AssistantError, type GeneratedImage, type ImageGenerator, type TextGenerator, type TextRequest } from '@/domain/assistant'
 
+import { classifyProviderError } from './errors'
+
 const TIMEOUT_MS = 120_000
+
+/** Google's newest Flash model is often busy. The previous one writes nearly as well, and a writer should not have to wait. */
+const GEMINI_TEXT_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash']
+
+/** Moving to the next model beats the SDK's own retries, which spend 30 seconds on a busy model. */
+const noRetries = { retryOptions: { attempts: 1 } }
 
 /** Claude. Refused requests are re-run on another model by the API, then reported if still refused. */
 export const anthropicText = (apiKey: string): TextGenerator => ({
@@ -32,15 +40,21 @@ export const geminiText = (apiKey: string): TextGenerator => ({
   provider: 'gemini',
   async generate({ system, prompt }: TextRequest) {
     const { GoogleGenAI } = await import('@google/genai')
-    const ai = new GoogleGenAI({ apiKey })
-    const interaction = await ai.interactions.create({
-      model: process.env.AI_GEMINI_TEXT_MODEL || 'gemini-3.8-flash',
-      system_instruction: system,
-      input: prompt,
-    })
-    const text = interaction.output_text?.trim()
-    if (!text) throw new AssistantError('Le modèle n’a rien renvoyé. Réessayez.')
-    return text
+    const ai = new GoogleGenAI({ apiKey, httpOptions: noRetries })
+    const models = process.env.AI_GEMINI_TEXT_MODEL ? [process.env.AI_GEMINI_TEXT_MODEL] : GEMINI_TEXT_MODELS
+
+    for (const [index, model] of models.entries()) {
+      try {
+        const interaction = await ai.interactions.create({ model, system_instruction: system, input: prompt })
+        const text = interaction.output_text?.trim()
+        if (!text) throw new AssistantError('Le modèle n’a rien renvoyé. Réessayez.')
+        return text
+      } catch (err) {
+        const hasNext = index < models.length - 1
+        if (!hasNext || classifyProviderError(err) !== 'overloaded') throw err
+      }
+    }
+    throw new AssistantError('Le modèle n’a rien renvoyé. Réessayez.')
   },
 })
 
@@ -49,7 +63,7 @@ export const geminiImage = (apiKey: string): ImageGenerator => ({
   provider: 'gemini',
   async generate(prompt: string): Promise<GeneratedImage> {
     const { GoogleGenAI } = await import('@google/genai')
-    const ai = new GoogleGenAI({ apiKey })
+    const ai = new GoogleGenAI({ apiKey, httpOptions: noRetries })
     const interaction = await ai.interactions.create({
       model: process.env.AI_IMAGE_MODEL || 'gemini-nano-banana-2.1',
       input: prompt,
