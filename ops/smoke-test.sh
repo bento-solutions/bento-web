@@ -66,7 +66,8 @@ check "robots.txt" 200 "$(code $PUB /robots.txt)"
 check "sitemap.xml" 200 "$(code $PUB /sitemap.xml)"
 contains "sitemap uses the public origin" "https://$PUB" "$(req $PUB /sitemap.xml)"
 check "cms / redirects" 307 "$(code $CMS /)"
-check "cms redirect stays on the cms host" "https://$CMS/admin" "$(req $CMS / -o /dev/null -w '%{redirect_url}')"
+# Relative, so the browser stays on whichever host it asked for.
+check "cms redirect stays on the cms host" "/admin" "$(req $CMS / -D - -o /dev/null | tr -d '\r' | awk 'tolower($1)=="location:"{print $2}')"
 contains "cms sends noindex" 'noindex' "$(req $CMS /admin -D - -o /dev/null | tr -d '\r' | grep -i x-robots-tag)"
 check "graphql removed" 404 "$(code $CMS /api/graphql -X POST -H 'content-type: application/json' -d '{"query":"{__typename}"}')"
 
@@ -80,9 +81,9 @@ check "wrong token refused" 404 "$(code $CMS "/admin/create-first-user?setup=wro
 check "users still empty" 0 "$(docker exec "$N-db" psql -U postgres -d bento_web -Atc 'select count(*) from users')"
 UNLOCK="$(req $CMS "/admin/create-first-user?setup=$SETUP" -D - -o /dev/null | tr -d '\r')"
 contains "link sets the cookie" 'bento-setup=' "$UNLOCK"
-contains "cookie is httpOnly" -i 'httponly' "$UNLOCK"
-printf '%s' "$UNLOCK" | grep -i '^set-cookie' | grep -qi 'secure' && echo "  ok    cookie is Secure behind https" || echo "  note  cookie is not marked Secure"
-check "link redirects without the token, on the cms host" "https://$CMS/admin/create-first-user" "$(printf '%s' "$UNLOCK" | awk 'tolower($1)=="location:"{print $2}')"
+contains "cookie is HttpOnly" 'HttpOnly' "$UNLOCK"
+contains "cookie is Secure behind https" 'Secure' "$UNLOCK"
+check "link redirects without the token in the address" "/admin/create-first-user" "$(printf '%s' "$UNLOCK" | awk 'tolower($1)=="location:"{print $2}')"
 COOKIE="bento-setup=$SETUP"
 check "form opens with the cookie" 200 "$(code $CMS /admin/create-first-user -H "Cookie: $COOKIE")"
 FIRST="$(req $CMS /api/users/first-register -X POST -H 'content-type: application/json' -H "Cookie: $COOKIE" -d "$BODY")"
@@ -125,7 +126,7 @@ contains "second post published" '"_status":"published"' "$R2"
 sleep 2
 contains "listed right after publishing" 'Deuxieme article' "$(req $PUB /blog)"
 
-echo "== scheduled publishing (the item that could not be confirmed)"
+echo "== scheduled publishing refreshes the cached pages"
 R3="$(req $CMS '/api/posts?draft=true' -X POST -H "$AUTH" -H 'content-type: application/json' -d "$(post 'Article programme' article-programme draft)")"
 SCHED="$(printf '%s' "$R3" | sed -nE 's/.*"doc":\{"id":([0-9]+).*/\1/p')"
 USERID="$(docker exec "$N-db" psql -U postgres -d bento_web -Atc 'select id from users limit 1')"
@@ -153,7 +154,7 @@ check "blog page refreshed itself after the scheduled publish" yes "${seen%%,*}"
 check "scheduled post page" 200 "$(code $PUB /blog/article-programme)"
 docker logs "$N-web" 2>&1 | grep -c 'Could not refresh' | sed 's/^/  "Could not refresh" lines in the log: /'
 
-echo "== every page, 600 requests (the dev-only intl error must not exist here)"
+echo "== every page, 600 requests"
 : > /tmp/bwtest.codes
 for round in $(seq 1 60); do
   for p in /blog /blog/premier-article /blog/deuxieme-article /blog/article-programme /blog/category/test /blog/author/auteur-test /blog/rss.xml /sitemap.xml /robots.txt /blog/nope; do
