@@ -83,7 +83,7 @@ After changing a collection, run `npm run generate:types` and `npm run migrate:c
 
 ## Deploying
 
-The pipeline matches bento-crm: `main` goes to production and `dev` to dev.bento212.com. The deploy job stays off until the repo variable `DEPLOY_ENABLED` is `true`.
+The pipeline matches bento-crm: `main` goes to production and `dev` to dev.bento212.com. Between the build and the deploy, `ops/smoke-test.sh` runs the exact image against a throwaway database, and a failure stops the deploy. The deploy job stays off until the repo variable `DEPLOY_ENABLED` is `true`.
 
 First-time setup:
 
